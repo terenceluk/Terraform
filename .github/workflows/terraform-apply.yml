@@ -34,16 +34,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Terraform Plan
-              id: tf_plan_dev
-              run: |
-                export TF_VAR_client_id=${{ secrets.DEV_ARM_CLIENT_ID }}
-                export TF_VAR_client_secret=${{ secrets.DEV_ARM_CLIENT_SECRET }}
-                export TF_VAR_tenant_id=${{ secrets.DEV_ARM_TENANT_ID }}
-                export TF_VAR_subscription_id=${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
-                export TF_VAR_admin_login=${{ secrets.DEV_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
-                export TF_VAR_administrator_login_password=${{ secrets.DEV_PSQL_ADMIN_LOGIN }}
-                terraform plan --var-file=terraform-dev.tfvars -no-color -out=plan.tfdata
-              working-directory: '.'
+        id: tf_plan_dev
+        run: |
+          export TF_VAR_client_id=${{ secrets.DEV_ARM_CLIENT_ID }}
+          export TF_VAR_client_secret=${{ secrets.DEV_ARM_CLIENT_SECRET }}
+          export TF_VAR_tenant_id=${{ secrets.DEV_ARM_TENANT_ID }}
+          export TF_VAR_subscription_id=${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
+          export TF_VAR_admin_login=${{ secrets.DEV_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
+          export TF_VAR_administrator_login_password=${{ secrets.DEV_PSQL_ADMIN_LOGIN }}
+          terraform plan --var-file=terraform-dev.tfvars -no-color
+        working-directory: '.'
 
       - name: Terraform Apply [Dev Environment]
         run: terraform apply -auto-approve plan.tfdata
