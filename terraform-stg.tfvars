@@ -13,7 +13,7 @@ dns_prefix          = "aks-dns"
 k8s_version         = "1.22.6"
 node_pool_name      = "default"
 node_pool_count     = 2
-node_pool_vm_size   = "B1ms"
+node_pool_vm_size   = "standard_b2ms"
 node_pool_max_count = 5
 node_pool_min_count = 1
 
