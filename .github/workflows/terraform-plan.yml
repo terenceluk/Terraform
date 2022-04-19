@@ -1,0 +1,67 @@
+name: 'Terraform Plan'
+##on:
+#  - pull_request
+on: [workflow_dispatch]
+
+jobs:
+  validate-terraform:
+    name: 'Terraform plan'
+    env:
+      client_id: ${{ secrets.DEV_ARM_CLIENT_ID }}
+      client_secret: ${{ secrets.DEV_ARM_CLIENT_SECRET }}
+      subscription_id: ${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
+      tenant_id: ${{ secrets.DEV_ARM_TENANT_ID }}
+      storage_access_key: ${{ secrets.DEV_STORAGE_ACCESS_KEY }}
+      storage_account_name: ${{ secrets.DEV_STORAGE_ACCOUNT_NAME }}
+      container_name: ${{ secrets.DEV_STORAGE_CONTAINER_NAME }}
+      terraform_state_file_name: "terraform.tfstate"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    environment: dev
+    
+    steps:
+      - name: Checkout GitHub Actions
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v1.2.1
+        with:
+          terraform_version: 1.0.9
+          terraform_wrapper: false
+
+      - name: Terraform Format
+        id: fmt
+        run: |
+          terraform fmt -check
+        working-directory: '.'
+        
+      - name: Terraform Init
+        id: tf_init_dev
+        run: |
+          terraform init \
+            -reconfigure \
+            -backend-config="storage_account_name=${{env.storage_account_name}}" \
+            -backend-config="container_name=${{env.container_name}}" \
+            -backend-config="key=${{env.terraform_state_file_name}}" \
+            -backend-config="access_key=${{env.storage_access_key}}"
+        working-directory: '.'
+
+      - name: Terraform Validate
+        id: tf_validate_dev
+        run: |
+          terraform validate -no-color
+        working-directory: '.'
+
+      - name: Terraform Plan
+        id: tf_plan_dev
+        run: |
+          export TF_VAR_client_id=${{ secrets.DEV_ARM_CLIENT_ID }}
+          export TF_VAR_client_secret=${{ secrets.DEV_ARM_CLIENT_SECRET }}
+          export TF_VAR_tenant_id=${{ secrets.DEV_ARM_TENANT_ID }}
+          export TF_VAR_subscription_id=${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
+          export TF_VAR_admin_login=${{ secrets.DEV_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
+          export TF_VAR_administrator_login_password=${{ secrets.DEV_PSQL_ADMIN_LOGIN }}
+          terraform plan --var-file=terraform-dev.tfvars -no-color
+        working-directory: '.'

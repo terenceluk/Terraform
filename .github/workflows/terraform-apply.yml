@@ -1,0 +1,38 @@
+name: 'Terraform apply'
+#on:
+#  push:
+#    branches:
+#      - dev
+
+on: [workflow_dispatch]
+
+jobs:
+  deploy-to-azure:
+    name: 'Deploy to Azure'
+    env:
+      client_id: ${{ secrets.DEV_ARM_CLIENT_ID }}
+      client_secret: ${{ secrets.DEV_ARM_CLIENT_SECRET }}
+      subscription_id: ${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
+      tenant_id: ${{ secrets.DEV_ARM_TENANT_ID }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v3
+
+      - name: 'Terraform Init'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          tf_actions_version: 0.12.24
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: "./terraform"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 'Terraform Apply'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          tf_actions_version: 0.12.24
+          tf_actions_subcommand: 'apply'
+          tf_actions_working_dir: "./terraform"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
