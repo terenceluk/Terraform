@@ -1,5 +1,5 @@
 /*
-This file contains all the values for the variables defined in variables.tf
+This file contains all the values for the variables defined in variables.tf and used for Staging
 */
 
 # Variable values for Azure resource group
