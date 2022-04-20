@@ -1,4 +1,4 @@
-name: 'Terraform apply'
+name: 'Terraform Apply'
 #on:
 #  push:
 #    branches:
@@ -14,9 +14,14 @@ jobs:
       client_secret: ${{ secrets.DEV_ARM_CLIENT_SECRET }}
       subscription_id: ${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
       tenant_id: ${{ secrets.DEV_ARM_TENANT_ID }}
+      storage_access_key: ${{ secrets.DEV_STORAGE_ACCESS_KEY }}
+      storage_account_name: ${{ secrets.DEV_STORAGE_ACCOUNT_NAME }}
+      container_name: ${{ secrets.DEV_STORAGE_CONTAINER_NAME }}
+      terraform_state_file_name: "terraform.tfstate"
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout'
+      - name: Checkout GitHub Actions
         uses: actions/checkout@v3
 
       - name: 'Terraform Init'
@@ -28,11 +33,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Terraform Apply'
-        uses: hashicorp/setup-terraform@v3
-        with:
-          tf_actions_version: 0.12.24
-          tf_actions_subcommand: 'apply'
-          tf_actions_working_dir: "./terraform"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Terraform Plan
+        id: tf_plan_dev
+        run: |
+          export TF_VAR_client_id=${{ secrets.DEV_ARM_CLIENT_ID }}
+          export TF_VAR_client_secret=${{ secrets.DEV_ARM_CLIENT_SECRET }}
+          export TF_VAR_tenant_id=${{ secrets.DEV_ARM_TENANT_ID }}
+          export TF_VAR_subscription_id=${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
+          export TF_VAR_admin_login=${{ secrets.DEV_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
+          export TF_VAR_administrator_login_password=${{ secrets.DEV_PSQL_ADMIN_LOGIN }}
+          terraform plan --var-file=terraform-dev.tfvars -no-color -out=plan.tfdata
+        working-directory: '.'
+
+      - name: Terraform Apply [Dev Environment]
+        run: terraform apply -auto-approve plan.tfdata
+        working-directory: '.'
