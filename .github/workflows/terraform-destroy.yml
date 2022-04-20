@@ -10,10 +10,12 @@ jobs:
   deploy-to-azure:
     name: 'Destroy to Azure'
     env:
-
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-latest
+
     steps:
+      - run: echo Working on ${{github.ref}} branch
+
       - name: Checkout GitHub Actions
         uses: actions/checkout@v3
 
