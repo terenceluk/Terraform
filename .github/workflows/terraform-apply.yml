@@ -62,7 +62,7 @@ jobs:
           export TF_VAR_subscription_id=${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
           export TF_VAR_admin_login=${{ secrets.DEV_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
           export TF_VAR_administrator_login_password=${{ secrets.DEV_PSQL_ADMIN_LOGIN }}
-          terraform plan --var-file=terraform-dev.tfvars -no-color
+          terraform plan --var-file=terraform-dev.tfvars -no-color -out=plan.tfdata
         if: github.ref == 'refs/heads/dev'
         working-directory: '.'
 
@@ -100,7 +100,7 @@ jobs:
           export TF_VAR_subscription_id=${{ secrets.STG_ARM_SUBSCRIPTION_ID }}
           export TF_VAR_admin_login=${{ secrets.STG_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
           export TF_VAR_administrator_login_password=${{ secrets.STG_PSQL_ADMIN_LOGIN }}
-          terraform plan --var-file=terraform-stg.tfvars -no-color
+          terraform plan --var-file=terraform-stg.tfvars -no-color -out=plan.tfdata
         if: github.ref == 'refs/heads/stg'
         working-directory: '.'
 
@@ -138,7 +138,7 @@ jobs:
           export TF_VAR_subscription_id=${{ secrets.PROD_ARM_SUBSCRIPTION_ID }}
           export TF_VAR_admin_login=${{ secrets.PROD_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
           export TF_VAR_administrator_login_password=${{ secrets.PROD_PSQL_ADMIN_LOGIN }}
-          terraform plan --var-file=terraform-prod.tfvars -no-color
+          terraform plan --var-file=terraform-prod.tfvars -no-color -out=plan.tfdata
         if: github.ref == 'refs/heads/prod'
         working-directory: '.'
 
