@@ -3,7 +3,7 @@ This file contains all the values for the variables defined in variables.tf and 
 */
 
 # Variable values for Azure resource group
-resource_group_name     = "ca-cn-dev-demo-rg"
+resource_group_name     = "ca-cn-stg-demo-rg"
 resource_group_location = "canadacentral"
 environment             = "stg"
 
