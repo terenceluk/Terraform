@@ -48,5 +48,5 @@ jobs:
         working-directory: '.'
 
       - name: Terraform Destroy [Dev Environment]
-        run: terraform apply -destroy -auto-approve plan.tfdata
+        run: terraform apply -destroy -auto-approve --var-file=terraform-dev.tfvars
         working-directory: '.'
