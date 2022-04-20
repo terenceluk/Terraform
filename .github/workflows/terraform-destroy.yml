@@ -50,7 +50,7 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         working-directory: '.'
 
-      - name: Terraform Destroy
+      - name: Terraform Dev Destroy
         run: |
           export TF_VAR_client_id=${{ secrets.DEV_ARM_CLIENT_ID }}
           export TF_VAR_client_secret=${{ secrets.DEV_ARM_CLIENT_SECRET }}
@@ -95,7 +95,7 @@ jobs:
         if: github.ref == 'refs/heads/stg'
         working-directory: '.'
 
-      - name: Terraform Destroy
+      - name: Terraform Stg Destroy
         run: |
           export TF_VAR_client_id=${{ secrets.STG_ARM_CLIENT_ID }}
           export TF_VAR_client_secret=${{ secrets.STG_ARM_CLIENT_SECRET }}
@@ -140,7 +140,7 @@ jobs:
         if: github.ref == 'refs/heads/prod'
         working-directory: '.'
 
-      - name: Terraform Destroy
+      - name: Terraform Prod Destroy
         run: |
           export TF_VAR_client_id=${{ secrets.PROD_ARM_CLIENT_ID }}
           export TF_VAR_client_secret=${{ secrets.PROD_ARM_CLIENT_SECRET }}
@@ -149,4 +149,5 @@ jobs:
           export TF_VAR_admin_login=${{ secrets.PROD_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
           export TF_VAR_administrator_login_password=${{ secrets.PROD_PSQL_ADMIN_LOGIN }}
           terraform apply -destroy -auto-approve --var-file=terraform-prod.tfvars
+        if: github.ref == 'refs/heads/prod'
         working-directory: '.'
