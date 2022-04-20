@@ -3,14 +3,11 @@ name: 'Terraform Plan'
 #  - pull_request
 on: [workflow_dispatch]
 
+# Terraform for Dev Environment
 jobs:
   validate-terraform:
     name: 'Terraform plan'
     env:
-      client_id: ${{ secrets.DEV_ARM_CLIENT_ID }}
-      client_secret: ${{ secrets.DEV_ARM_CLIENT_SECRET }}
-      subscription_id: ${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
-      tenant_id: ${{ secrets.DEV_ARM_TENANT_ID }}
       storage_access_key: ${{ secrets.DEV_STORAGE_ACCESS_KEY }}
       storage_account_name: ${{ secrets.DEV_STORAGE_ACCOUNT_NAME }}
       container_name: ${{ secrets.DEV_STORAGE_CONTAINER_NAME }}
