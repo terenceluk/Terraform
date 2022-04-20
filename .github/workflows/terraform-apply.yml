@@ -142,7 +142,7 @@ jobs:
         if: github.ref == 'refs/heads/prod'
         working-directory: '.'
 
-        - name: Terraform Apply
+      - name: Terraform Apply
         run: terraform apply -auto-approve plan.tfdata
         if: github.ref == 'refs/heads/prod'
         working-directory: '.'
