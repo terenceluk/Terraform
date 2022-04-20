@@ -32,7 +32,7 @@ jobs:
         working-directory: '.'
 
 # Terraform Init, Validate, and Plan for Dev Environment
-      - name: Terraform Init
+      - name: Terraform Dev Init
         id: tf_init_dev
         run: |
           terraform init \
@@ -44,14 +44,14 @@ jobs:
         if: github.ref == 'refs/heads/dev'
         working-directory: '.'
 
-      - name: Terraform Validate
+      - name: Terraform Dev Validate
         id: tf_validate_dev
         run: |
           terraform validate -no-color
         if: github.ref == 'refs/heads/dev'
         working-directory: '.'
 
-      - name: Terraform Plan
+      - name: Terraform Dev Plan
         id: tf_plan_dev
         run: |
           export TF_VAR_client_id=${{ secrets.DEV_ARM_CLIENT_ID }}
@@ -65,7 +65,7 @@ jobs:
         working-directory: '.'
 
 # Terraform Init, Validate, and Plan for Stg Environment
-      - name: Terraform Init
+      - name: Terraform Stg Init
         id: tf_init_stg
         run: |
           terraform init \
@@ -77,14 +77,14 @@ jobs:
         if: github.ref == 'refs/heads/stg'
         working-directory: '.'
 
-      - name: Terraform Validate
+      - name: Terraform Stg Validate
         id: tf_validate_stg
         run: |
           terraform validate -no-color
         if: github.ref == 'refs/heads/stg'
         working-directory: '.'
 
-      - name: Terraform Plan
+      - name: Terraform Stg Plan
         id: tf_plan_stg
         run: |
           export TF_VAR_client_id=${{ secrets.STG_ARM_CLIENT_ID }}
@@ -98,7 +98,7 @@ jobs:
         working-directory: '.'
 
 # Terraform Init, Validate, and Plan for Prod Environment
-      - name: Terraform Init
+      - name: Terraform Prod Init
         id: tf_init_prod
         run: |
           terraform init \
@@ -110,14 +110,14 @@ jobs:
         if: github.ref == 'refs/heads/prod'
         working-directory: '.'
 
-      - name: Terraform Validate
+      - name: Terraform Prod Validate
         id: tf_validate_prod
         run: |
           terraform validate -no-color
         if: github.ref == 'refs/heads/prod'
         working-directory: '.'
 
-      - name: Terraform Plan
+      - name: Terraform Prod Plan
         id: tf_plan_prod
         run: |
           export TF_VAR_client_id=${{ secrets.PROD_ARM_CLIENT_ID }}
