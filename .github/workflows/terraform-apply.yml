@@ -18,8 +18,9 @@ jobs:
     steps:
 
       # Address pull_request event (in which case the $GITHUB_REF contains something not useful like refs/pull/4/merge)
+      # Obtaining the target branch of the pull request: https://docs.github.com/en/actions/learn-github-actions/contexts#github-context
       - name: Get branch name
-        run: echo "::set-output name=branch::${GITHUB_HEAD_REF#refs/heads/}"
+        run: echo "::set-output name=branch::${GITHUB_BASE_REF#refs/heads/}"
         id: myref
 
       - run: echo Working on ${{ steps.myref.outputs.branch }} branch
