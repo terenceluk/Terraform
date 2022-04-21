@@ -51,14 +51,14 @@ jobs:
             -backend-config="container_name=${{ secrets.DEV_STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=terraform.tfstate" \
             -backend-config="access_key=${{ secrets.DEV_STORAGE_ACCESS_KEY }}"
-        if: steps.myref.outputs.branch == 'refs/heads/dev'
+        if: steps.myref.outputs.branch == 'dev'
         working-directory: '.'
 
       - name: Terraform Dev Validate
         id: tf_validate_dev
         run: |
           terraform validate -no-color
-        if: steps.myref.outputs.branch == 'refs/heads/dev'
+        if: steps.myref.outputs.branch == 'dev'
         working-directory: '.'
 
       - name: Terraform Dev Plan
@@ -71,12 +71,12 @@ jobs:
           export TF_VAR_admin_login=${{ secrets.DEV_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
           export TF_VAR_administrator_login_password=${{ secrets.DEV_PSQL_ADMIN_LOGIN }}
           terraform plan --var-file=terraform-dev.tfvars -no-color -out=plan.tfdata
-        if: steps.myref.outputs.branch == 'refs/heads/dev'
+        if: steps.myref.outputs.branch == 'dev'
         working-directory: '.'
 
       - name: Terraform Apply
         run: terraform apply -auto-approve plan.tfdata
-        if: steps.myref.outputs.branch == 'refs/heads/dev'
+        if: steps.myref.outputs.branch == 'dev'
         working-directory: '.'
 
 # Terraform Init, Validate, Plan, and Apply Stg Environment
@@ -89,14 +89,14 @@ jobs:
             -backend-config="container_name=${{ secrets.STG_STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=terraform.tfstate" \
             -backend-config="access_key=${{ secrets.STG_STORAGE_ACCESS_KEY }}"
-        if: steps.myref.outputs.branch == 'refs/heads/stg'
+        if: steps.myref.outputs.branch == 'stg'
         working-directory: '.'
 
       - name: Terraform Stg Validate
         id: tf_validate_stg
         run: |
           terraform validate -no-color
-        if: steps.myref.outputs.branch == 'refs/heads/stg'
+        if: steps.myref.outputs.branch == 'stg'
         working-directory: '.'
 
       - name: Terraform Stg Plan
@@ -109,12 +109,12 @@ jobs:
           export TF_VAR_admin_login=${{ secrets.STG_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
           export TF_VAR_administrator_login_password=${{ secrets.STG_PSQL_ADMIN_LOGIN }}
           terraform plan --var-file=terraform-stg.tfvars -no-color -out=plan.tfdata
-        if: steps.myref.outputs.branch == 'refs/heads/stg'
+        if: steps.myref.outputs.branch == 'stg'
         working-directory: '.'
 
       - name: Terraform Apply
         run: terraform apply -auto-approve plan.tfdata
-        if: steps.myref.outputs.branch == 'refs/heads/stg'
+        if: steps.myref.outputs.branch == 'stg'
         working-directory: '.'
 
 # Terraform Init, Validate, Plan, and Apply Prod Environment
@@ -127,14 +127,14 @@ jobs:
             -backend-config="container_name=${{ secrets.PROD_STORAGE_CONTAINER_NAME }}" \
             -backend-config="key=terraform.tfstate" \
             -backend-config="access_key=${{ secrets.PROD_STORAGE_ACCESS_KEY }}"
-        if: steps.myref.outputs.branch == 'refs/heads/prod'
+        if: steps.myref.outputs.branch == 'prod'
         working-directory: '.'
 
       - name: Terraform Prod Validate
         id: tf_validate_prod
         run: |
           terraform validate -no-color
-        if: steps.myref.outputs.branch == 'refs/heads/prod'
+        if: steps.myref.outputs.branch == 'prod'
         working-directory: '.'
 
       - name: Terraform Prod Plan
@@ -147,10 +147,10 @@ jobs:
           export TF_VAR_admin_login=${{ secrets.PROD_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
           export TF_VAR_administrator_login_password=${{ secrets.PROD_PSQL_ADMIN_LOGIN }}
           terraform plan --var-file=terraform-prod.tfvars -no-color -out=plan.tfdata
-        if: steps.myref.outputs.branch == 'refs/heads/prod'
+        if: steps.myref.outputs.branch == 'prod'
         working-directory: '.'
 
       - name: Terraform Apply
         run: terraform apply -auto-approve plan.tfdata
-        if: steps.myref.outputs.branch == 'refs/heads/prod'
+        if: steps.myref.outputs.branch == 'prod'
         working-directory: '.'
