@@ -1,6 +1,9 @@
 name: 'Terraform Plan'
 on:
   push:
+    paths-ignore:
+    - '.github/**'
+    - '**.md'
     branches:
       - dev
       - stg
