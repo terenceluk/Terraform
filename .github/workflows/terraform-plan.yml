@@ -1,7 +1,13 @@
 name: 'Terraform Plan'
-##on:
-#  - pull_request
-on: [workflow_dispatch]
+on:
+  push:
+    branches:
+      - dev
+      - stg
+      - prod
+
+# Uncomment for manual run of this workflow
+# on: [workflow_dispatch]
 
 # Terraform for Dev Environment
 jobs:
