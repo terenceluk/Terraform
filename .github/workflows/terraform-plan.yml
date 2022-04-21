@@ -6,7 +6,7 @@ on:
       - stg
       - prod
 
-# Uncomment for manual run of this workflow
+# Uncomment for manual run of this Terraform Plan workflow
 # on: [workflow_dispatch]
 
 # Terraform for Dev Environment
