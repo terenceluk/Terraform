@@ -1,0 +1,103 @@
+name: 'Terraform Apply for Dev'
+on:
+  workflow_run:
+    workflows: ["Terraform Plan"]
+    types:
+      - completed
+# Uncomment for manual run of this Terraform Plan workflow
+# on: [workflow_dispatch]
+
+jobs:
+  # First job starts to get the current branch name so we can set the environment variable
+  Get-Branch-Name:
+    runs-on: ubuntu-latest
+    # First job will only run if the Terraform Plan workflow was successful
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} 
+    steps:
+      - name: Get branch name
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/dev" ]; then
+            echo "::set-output name=env_name::dev-deploy"
+          else
+            exit 1
+          fi
+        id: branch_check
+
+      # Display what env_name is set for the variable
+      - name: Use variable setup in previous step
+        run: echo "We have set the environment name to ${{ steps.branch_check.outputs.env_name }}"
+
+    # Setting the env_name variable so we can use it in the next job
+    outputs:
+      env_name: ${{ steps.branch_check.outputs.env_name }}
+
+  # Second job starts for Terraform
+  deploy-to-azure:
+    needs: Get-Branch-Name
+    name: 'Deploy to Azure'
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    # Second job will only run if the Terraform Plan workflow was successful
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} 
+    environment: ${{ needs.Get-Branch-Name.outputs.env_name }}
+
+    steps:
+      # Display the environment variable from previous job
+      - run: echo "Working in environment ${{ needs.Get-Branch-Name.outputs.env_name }}"
+
+      - name: Checkout GitHub Actions
+        uses: actions/checkout@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v1.2.1
+        with:
+          terraform_version: 1.0.9
+          terraform_wrapper: false
+
+      - name: Terraform Format
+        id: fmt
+        run: |
+          terraform fmt -check
+        working-directory: '.'
+
+# Terraform Init, Validate, Plan, and Apply for Dev Environment
+      - name: Terraform Dev Init
+        id: tf_init_dev
+        run: |
+          terraform init \
+            -reconfigure \
+            -backend-config="storage_account_name=${{ secrets.DEV_STORAGE_ACCOUNT_NAME }}" \
+            -backend-config="container_name=${{ secrets.DEV_STORAGE_CONTAINER_NAME }}" \
+            -backend-config="key=terraform.tfstate" \
+            -backend-config="access_key=${{ secrets.DEV_STORAGE_ACCESS_KEY }}"
+        if: needs.Get-Branch-Name.outputs.env_name == 'dev-deploy' # This defines how the step will only run if the branch name is set to dev-deploy which requires reviewer approval
+        working-directory: '.' # This terraform init will use a preconfigured Azure storage account to store the tfstate
+
+      - name: Terraform Dev Validate
+        id: tf_validate_dev
+        run: |
+          terraform validate -no-color
+        if: needs.Get-Branch-Name.outputs.env_name == 'dev-deploy'
+        working-directory: '.'
+
+      - name: Terraform Dev Plan
+        id: tf_plan_dev
+        run: |
+          export TF_VAR_client_id=${{ secrets.DEV_ARM_CLIENT_ID }}
+          export TF_VAR_client_secret=${{ secrets.DEV_ARM_CLIENT_SECRET }}
+          export TF_VAR_tenant_id=${{ secrets.DEV_ARM_TENANT_ID }}
+          export TF_VAR_subscription_id=${{ secrets.DEV_ARM_SUBSCRIPTION_ID }}
+          export TF_VAR_admin_login=${{ secrets.DEV_PSQL_ADMINISTRATOR_LOGIN_PASSWORD }}
+          export TF_VAR_administrator_login_password=${{ secrets.DEV_PSQL_ADMIN_LOGIN }}
+          terraform plan --var-file=./Variables/terraform-dev.tfvars -no-color -out=plan.tfdata
+        if: needs.Get-Branch-Name.outputs.env_name == 'dev-deploy'
+        working-directory: '.' # This terraform plan exports the GitHub secrets and uses TF_VAR so the terraform files can use the variable values. The plan is also output to plan.tfdata for apply later
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve plan.tfdata # Use the previous terraform plan output to apply
+        if: needs.Get-Branch-Name.outputs.env_name == 'dev-deploy'
+        working-directory: '.'
